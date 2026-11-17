@@ -3,8 +3,6 @@
  * When the FastAPI backend exists, these types should mirror its response schema.
  */
 
-export type Experience = 'homebuyer' | 'investor'
-
 /** Visual tone only; it does not encode any financial judgement. */
 export type Tone = 'neutral' | 'positive' | 'caution' | 'negative'
 
@@ -38,7 +36,6 @@ export interface PropertySummary {
 }
 
 export interface MockAnalysis {
-  experience: Experience
   property: PropertySummary
   summary: string
   keyMetrics: Metric[]
@@ -47,8 +44,8 @@ export interface MockAnalysis {
   nextSteps: string[]
 }
 
+/** Landing-page copy describing the investor experience. */
 export interface ExperienceInfo {
-  id: Experience
   name: string
   audience: string
   tagline: string

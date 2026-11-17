@@ -3,8 +3,7 @@ import { PageContainer } from './PageContainer'
 import { ThemeToggle } from './ThemeToggle'
 
 const navLinks = [
-  { to: '/analyze/homebuyer', label: 'Homebuyer' },
-  { to: '/analyze/investor', label: 'Investor' },
+  { to: '/analyze', label: 'Analyze property' },
 ]
 
 export function AppHeader() {

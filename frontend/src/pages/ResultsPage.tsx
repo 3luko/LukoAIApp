@@ -1,5 +1,3 @@
-import { useParams } from 'react-router'
-import { ExperienceSwitcher } from '../components/analysis/ExperienceSwitcher'
 import { MetricGrid } from '../components/analysis/MetricGrid'
 import { MetricSectionCard } from '../components/analysis/MetricSectionCard'
 import { MockDataBanner } from '../components/analysis/MockDataBanner'
@@ -9,24 +7,16 @@ import { PageContainer } from '../components/layout/PageContainer'
 import { LinkButton } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { SectionHeading } from '../components/ui/SectionHeading'
-import { experiences, isExperience } from '../data/experiences'
-import { mockAnalyses } from '../data/mockAnalyses'
-import { NotFoundPage } from './NotFoundPage'
+import { investorInfo } from '../data/investor'
+import { mockInvestorAnalysis } from '../data/mockAnalyses'
 
 export function ResultsPage() {
-  const { experience } = useParams()
-  if (!isExperience(experience)) return <NotFoundPage />
-
-  const info = experiences[experience]
   // Mock data for now. Later this comes from the backend API.
-  const analysis = mockAnalyses[experience]
+  const analysis = mockInvestorAnalysis
 
   return (
     <PageContainer className="space-y-6 py-10 sm:py-14">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <SectionHeading as="h1" eyebrow={`${info.name} results`} title="Property analysis" />
-        <ExperienceSwitcher basePath="/results" />
-      </div>
+      <SectionHeading as="h1" eyebrow={`${investorInfo.name} results`} title="Property analysis" />
 
       <MockDataBanner />
       <PropertySummaryCard property={analysis.property} />
@@ -59,7 +49,7 @@ export function ResultsPage() {
       </div>
 
       <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-        <LinkButton to={`/analyze/${experience}`} variant="secondary">
+        <LinkButton to="/analyze" variant="secondary">
           Edit inputs
         </LinkButton>
         <LinkButton to="/" variant="ghost">

@@ -18,7 +18,7 @@ src/
   components/ui/          generic building blocks (Button, Card, FormField, ...)
   components/layout/      header, footer, theme toggle, container
   components/analysis/    LukoAI-specific presentational pieces
-  data/                   experience copy, form field config, MOCK analyses
+  data/                   investor copy, form field config, MOCK analysis
   types/                  shared TypeScript types
   index.css               Tailwind import + light/dark color tokens
 ```

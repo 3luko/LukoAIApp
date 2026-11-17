@@ -1,20 +1,18 @@
 import type { ExperienceInfo } from '../../types/analysis'
 import { LinkButton } from '../ui/Button'
 import { Card } from '../ui/Card'
-import { ArrowRightIcon, ChartIcon, CheckIcon, HomeIcon } from '../ui/icons'
+import { ArrowRightIcon, ChartIcon, CheckIcon } from '../ui/icons'
 
 interface ExperienceCardProps {
   experience: ExperienceInfo
 }
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
-  const Icon = experience.id === 'homebuyer' ? HomeIcon : ChartIcon
-
   return (
     <Card className="flex flex-col gap-5">
       <div className="flex items-center gap-3">
         <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
-          <Icon width={22} height={22} />
+          <ChartIcon width={22} height={22} />
         </span>
         <div>
           <h3 className="text-lg font-semibold">{experience.name}</h3>
@@ -36,8 +34,8 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
         ))}
       </ul>
 
-      <LinkButton to={`/analyze/${experience.id}`} className="mt-auto w-full">
-        Start {experience.name.toLowerCase()} analysis
+      <LinkButton to="/analyze" className="mt-auto w-full">
+        Analyze a property
         <ArrowRightIcon width={16} height={16} />
       </LinkButton>
     </Card>

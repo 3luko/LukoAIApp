@@ -22,28 +22,15 @@ export interface FieldGroup {
   fields: FieldDef[]
 }
 
-interface BasicData {
-  address : string
-  listPrice : number
-  propertyType : string
-  downPayment : number 
-}
-
-
-export interface HomebuyerFormValues extends BasicData {
-  annualIncome : number
-  monthlyDebts : number
-  creditRange : string
-  comfortableMonthlyPayments? : number
-  duration : string
-}
-
-
-export interface InvestorFormValues extends BasicData{
-  financing : string
-  reserves : number
-  expectedRent? : number
-  management : string
-  goal : string
-
+/** The submitted investor form. Field names match the ids in data/formFields.ts. */
+export interface InvestorFormValues {
+  address: string
+  listPrice: number
+  propertyType: string
+  downPayment: number
+  financing: string
+  reserves: number
+  expectedRent?: number
+  management: string
+  goal: string
 }

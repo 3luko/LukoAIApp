@@ -5,10 +5,6 @@ const control =
   'w-full rounded-lg border border-border bg-bg px-3 py-2.5 text-sm text-fg placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-accent/30'
 
 
-const onChange = (event: ChangeEvent<HTMLElement>) => {
-  
-}
-
 interface FormFieldProps {
   field: FieldDef;
   value: string;
@@ -17,7 +13,8 @@ interface FormFieldProps {
 
 /**
  * Renders a labeled input from a FieldDef.
- * Inputs are uncontrolled placeholders: there's no state and no validation yet.
+ * Controlled: the parent owns the value and receives changes through onChange.
+ * There's no validation yet.
  */
 export function FormField({ field, value, onChange }: FormFieldProps) {
   const hintId = field.hint ? `${field.id}-hint` : undefined
@@ -30,7 +27,14 @@ export function FormField({ field, value, onChange }: FormFieldProps) {
       </label>
 
       {field.type === 'select' ? (
-        <select id={field.id} name={field.id} defaultValue="" aria-describedby={hintId} className={control}>
+        <select
+          id={field.id}
+          name={field.id}
+          value={value}
+          onChange={onChange}
+          aria-describedby={hintId}
+          className={control}
+        >
           <option value="" disabled>
             Select…
           </option>
@@ -52,6 +56,8 @@ export function FormField({ field, value, onChange }: FormFieldProps) {
             name={field.id}
             type="text"
             inputMode={field.type === 'number' ? 'decimal' : undefined}
+            value={value}
+            onChange={onChange}
             placeholder={field.placeholder}
             aria-describedby={hintId}
             className={`${control} ${field.prefix ? 'pl-7' : ''}`}

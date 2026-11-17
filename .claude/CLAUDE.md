@@ -1,10 +1,6 @@
 # LukoAI
 
-LukoAI is a real estate ownership intelligence platform with two separate experiences:
-1. **Homebuyer**: first-time buyers evaluating a primary residence (affordability, monthly cost, risk).
-2. **Investor**: first-time investors evaluating a rental (cash flow, returns, risk).
-
-These two experiences have their own analysis workflows. Keep their forms, types and results separate rather than forcing them into one shared shape.
+LukoAI is a real estate ownership intelligence platform for **first-time property investors** evaluating a rental property (cash flow, returns, risk). The product is investor-only; there is no homebuyer experience. Don't add homebuyer features (primary residence affordability, credit score inputs, owner-occupied financing) unless the developer asks.
 
 ## Architecture
 

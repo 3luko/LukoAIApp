@@ -2,12 +2,12 @@ import { ExperienceCard } from '../components/analysis/ExperienceCard'
 import { PageContainer } from '../components/layout/PageContainer'
 import { LinkButton } from '../components/ui/Button'
 import { SectionHeading } from '../components/ui/SectionHeading'
-import { experienceList } from '../data/experiences'
+import { investorInfo } from '../data/investor'
 
 const steps = [
-  { title: 'Choose your path', body: 'Buying a home to live in, or evaluating a rental investment.' },
-  { title: 'Share a few details', body: 'A property address and a rough picture of your finances and goals.' },
-  { title: 'Get a clear analysis', body: 'Costs, key numbers, and risks, explained in plain language.' },
+  { title: 'Enter the property', body: 'The address, listing price, and property type you are considering.' },
+  { title: 'Add rent and financing', body: 'Your down payment, financing type, reserves, and expected rent.' },
+  { title: 'Get a clear analysis', body: 'Cash flow, return indicators, and risks, explained in plain language.' },
 ]
 
 export function LandingPage() {
@@ -27,31 +27,26 @@ export function LandingPage() {
             Own smarter. <span className="text-accent">Decide with confidence.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
-            LukoAI helps first-time homebuyers and first-time investors understand what a property really costs
-            and what risks come with it, before they commit.
+            LukoAI helps first-time property investors understand what a rental property really earns, costs, and
+            risks before they commit capital.
           </p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <LinkButton to="/analyze/homebuyer" size="lg">
-              I’m buying a home
-            </LinkButton>
-            <LinkButton to="/analyze/investor" size="lg" variant="secondary">
-              I’m evaluating an investment
+          <div className="mt-8 flex justify-center">
+            <LinkButton to="/analyze" size="lg">
+              Analyze a property
             </LinkButton>
           </div>
         </PageContainer>
       </section>
 
-      {/* Experiences */}
+      {/* Experience */}
       <PageContainer className="py-16 sm:py-20">
         <SectionHeading
-          eyebrow="Two experiences"
-          title="Built for where you are"
-          description="Buying a home to live in and buying a property to rent are different decisions, so LukoAI analyzes them differently."
+          eyebrow="Built for investors"
+          title="See the numbers behind a rental"
+          description="LukoAI focuses on the questions first-time investors ask: will this property pay for itself, and what could go wrong?"
         />
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          {experienceList.map((exp) => (
-            <ExperienceCard key={exp.id} experience={exp} />
-          ))}
+        <div className="mt-8 max-w-xl">
+          <ExperienceCard experience={investorInfo} />
         </div>
       </PageContainer>
 
