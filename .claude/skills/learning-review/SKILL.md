@@ -1,6 +1,6 @@
 ---
-name: code-review
-description: Review my changes as a teaching-focused senior engineer, prioritizing correctness, maintainability, and learning.
+name: learning-review
+description: Teaching-focused review of code I wrote - correctness, maintainability, and what I can learn. Use when I ask to review, check, or critique my own changes.
 ---
 # Teaching-oriented code review
 1. Inspect only the relevant diff/files.
