@@ -1,7 +1,8 @@
+import { Navigate, useLocation } from 'react-router'
+import { InputSummaryCard } from '../components/analysis/InputSummaryCard'
 import { MetricGrid } from '../components/analysis/MetricGrid'
 import { MetricSectionCard } from '../components/analysis/MetricSectionCard'
 import { MockDataBanner } from '../components/analysis/MockDataBanner'
-import { PropertySummaryCard } from '../components/analysis/PropertySummaryCard'
 import { RiskList } from '../components/analysis/RiskList'
 import { PageContainer } from '../components/layout/PageContainer'
 import { LinkButton } from '../components/ui/Button'
@@ -9,17 +10,24 @@ import { Card } from '../components/ui/Card'
 import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorInfo } from '../data/investor'
 import { mockInvestorAnalysis } from '../data/mockAnalyses'
+import type { InvestorFormValues } from '../types/form'
 
 export function ResultsPage() {
-  // Mock data for now. Later this comes from the backend API.
-  const analysis = mockInvestorAnalysis
+  // The analyze form passes its validated values here as router state.
+  // They're missing when the page is opened directly (shared link, typed URL, new tab).
+  const location = useLocation()
+  const inputs = location.state as InvestorFormValues | null
 
+  if (!inputs) return <Navigate to="/analyze" replace />
+
+  // Mock metrics for now. Later these are calculated from `inputs` by the backend.
+  const analysis = mockInvestorAnalysis
   return (
     <PageContainer className="space-y-6 py-10 sm:py-14">
       <SectionHeading as="h1" eyebrow={`${investorInfo.name} results`} title="Property analysis" />
 
       <MockDataBanner />
-      <PropertySummaryCard property={analysis.property} />
+      <InputSummaryCard inputs={inputs} />
 
       <Card>
         <h2 className="font-semibold">Summary</h2>
