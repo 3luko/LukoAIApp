@@ -9,15 +9,14 @@ import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorFormGroups } from '../data/formFields'
 import { investorInfo } from '../data/investor'
 import type { InvestorFormValues } from '../types/form'
+import type { InvestorFormErrors } from '../lib/validateInvestorForm'
 import { parseAmount, validateInvestorForm } from '../lib/validateInvestorForm'
 
 
 export function AnalyzePage() {
   const navigate = useNavigate()
   const [values, setValues] = useState<Record<string, string>>({})
-
-  
-
+  const [errors, setErrors] = useState<InvestorFormErrors>({})
 
   // Price and rent are required: the analysis can't run without them.
   const canSubmit = Boolean(values.listPrice?.trim()) && Boolean(values.expectedRent?.trim())
@@ -25,19 +24,25 @@ export function AnalyzePage() {
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target
     setValues((prev) => ({ ...prev, [name]: value }))
+    // Clear a field's message as soon as the user edits it.
+    setErrors((prev) => (prev[name as keyof InvestorFormValues] ? { ...prev, [name]: undefined } : prev))
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    // TODO(you): Validate `values`, convert them to InvestorFormValues (numbers, not strings),
-    const raw = values;
+    const raw = values
 
-
-    const errors = validateInvestorForm(raw)
-    if (Object.keys(errors).length > 0) {
-      console.log('Form errors:', errors)
+    const found = validateInvestorForm(raw)
+    if (Object.keys(found).length > 0) {
+      setErrors(found)
+      // Move focus to the first invalid field, in the order they appear on the page.
+      const firstInvalid = investorFormGroups
+        .flatMap((group) => group.fields)
+        .find((field) => found[field.id as keyof InvestorFormValues])
+      if (firstInvalid) document.getElementById(firstInvalid.id)?.focus()
       return
     }
+    setErrors({})
 
     const parsed : InvestorFormValues = {
       address : raw.address,
@@ -51,7 +56,7 @@ export function AnalyzePage() {
       reserves : parseAmount(raw.reserves)
     }
 
-    // and pass them to the results page (hint: think about where this state should live).
+    // The results page reads these from router state.
     navigate('/results', { state : parsed })
   }
 
@@ -77,6 +82,7 @@ export function AnalyzePage() {
                     field={field}
                     value={values[field.id] ?? ''}
                     onChange={handleChange}
+                    error={errors[field.id as keyof InvestorFormValues]}
                   />
                 ))}
               </div>
