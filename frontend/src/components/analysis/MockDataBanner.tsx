@@ -1,6 +1,6 @@
 import { InfoIcon } from '../ui/icons'
 
-/** Clearly marks a view as showing sample data, not a real analysis. */
+/** Clearly marks the content below it as sample data, not a real analysis. */
 export function MockDataBanner() {
   return (
     <div
@@ -9,10 +9,10 @@ export function MockDataBanner() {
     >
       <InfoIcon className="mt-px shrink-0 text-caution" />
       <p>
-        <span className="font-semibold">Sample data.</span>{' '}
+        <span className="font-semibold">Sample content.</span>{' '}
         <span className="text-muted">
-          These numbers are placeholders for layout only. They are not calculated from your inputs and are not a
-          recommendation.
+          The summary, risks and next steps below are placeholders. They are not calculated from your inputs and are
+          not a recommendation.
         </span>
       </p>
     </div>

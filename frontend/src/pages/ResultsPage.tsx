@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from 'react-router'
+import { CalculationResults } from '../components/analysis/CalculationResults'
 import { InputSummaryCard } from '../components/analysis/InputSummaryCard'
-import { MetricGrid } from '../components/analysis/MetricGrid'
-import { MetricSectionCard } from '../components/analysis/MetricSectionCard'
 import { MockDataBanner } from '../components/analysis/MockDataBanner'
 import { RiskList } from '../components/analysis/RiskList'
 import { PageContainer } from '../components/layout/PageContainer'
@@ -10,46 +9,46 @@ import { Card } from '../components/ui/Card'
 import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorInfo } from '../data/investor'
 import { mockInvestorAnalysis } from '../data/mockAnalyses'
+import { useAnalysis } from '../hooks/useAnalysis'
+import { isInvestorFormValues } from '../lib/validateInvestorForm'
 import type { InvestorFormValues } from '../types/form'
 
 export function ResultsPage() {
-  // The analyze form passes its validated values here as router state.
-  // They're missing when the page is opened directly (shared link, typed URL, new tab).
-  const location = useLocation()
-  const inputs = location.state as InvestorFormValues | null
+  // The analyze form passes its validated values here as router state. They're missing when
+  // the page is opened directly (typed URL, new tab), and anyone can edit history state, so
+  // check the shape before using it.
+  const state: unknown = useLocation().state
+  if (!isInvestorFormValues(state)) return <Navigate to="/analyze" replace />
 
-  if (!inputs) return <Navigate to="/analyze" replace />
+  return <Results inputs={state} />
+}
 
-  // Mock metrics for now. Later these are calculated from `inputs` by the backend.
-  const analysis = mockInvestorAnalysis
+function Results({ inputs }: { inputs: InvestorFormValues }) {
+  const { status, data, error, retry } = useAnalysis(inputs)
+
+  // Summary, risks and next steps are still sample content (the written summary comes later).
+  const sample = mockInvestorAnalysis
+
   return (
     <PageContainer className="space-y-6 py-10 sm:py-14">
       <SectionHeading as="h1" eyebrow={`${investorInfo.name} results`} title="Property analysis" />
 
-      <MockDataBanner />
       <InputSummaryCard inputs={inputs} />
+      <CalculationResults status={status} data={data} error={error} onRetry={retry} />
+
+      <MockDataBanner />
 
       <Card>
         <h2 className="font-semibold">Summary</h2>
-        <p className="mt-2 max-w-3xl font-sans leading-relaxed text-muted">{analysis.summary}</p>
+        <p className="mt-2 max-w-3xl font-sans leading-relaxed text-muted">{sample.summary}</p>
       </Card>
 
-      <section aria-label="Key metrics">
-        <MetricGrid metrics={analysis.keyMetrics} />
-      </section>
-
       <div className="grid gap-6 lg:grid-cols-2">
-        {analysis.sections.map((section) => (
-          <MetricSectionCard key={section.title} section={section} />
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RiskList risks={analysis.risks} />
+        <RiskList risks={sample.risks} />
         <Card>
           <h3 className="font-semibold">Suggested next steps</h3>
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted marker:text-subtle">
-            {analysis.nextSteps.map((step) => (
+            {sample.nextSteps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
