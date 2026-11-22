@@ -1,79 +1,96 @@
 # Rental income and cash flow logic
 
-- **Status:** Draft (the developer's design notes, written up; nothing here is implemented yet)
-- **Date:** 2026-11-21
-- **Owner:** the developer writes the calculations. This document records the rules they chose.
+- **Status:** Approved on 2026-11-21 and implemented in `backend/app/domain/`. Defaults are starting points, not market facts.
+- **Tests:** `backend/tests/domain/`
 
 ## Goals
 
-Estimate a rental property's monthly rent and monthly cash flow for a first-time investor. Every assumption is visible, and the investor can change it.
+Estimate a rental property's monthly cash flow for a first-time investor. Every assumption is visible, and the investor can change it.
 
-## 1. Monthly rental income
+## Formula
 
-Comparable rents in the same city or neighborhood would give the best estimate. Each comparable lookup costs API credits (see [0001](../decisions/0001-address-lookup-on-demand.md)), so the app does not fetch them automatically.
+All amounts are monthly. Annual = monthly × 12.
 
-Sources, in priority order:
+```
+effectiveRent     = rent - (rent × vacancyRate)
+operatingExpenses = propertyTax + insurance + hoa + utilities + maintenance + management
+NOI               = effectiveRent - operatingExpenses
+cashFlow          = NOI - capex - debtService
+```
 
-| Priority | Source | Confidence label |
+| Line | Calculation | Default / source |
 |---|---|---|
-| 1 | The investor enters the monthly rent | Investor-provided |
-| 2 | Rent per square foot (when no other data exists) | **Lower confidence** |
+| Rent | Investor input (required for now) | Investor |
+| Vacancy | `rent × vacancyRate` | 5% |
+| Property tax | `annualTax / 12` | Investor or property data; **missing = 0, flagged** |
+| Insurance | `annualPremium / 12` | Investor or property data; **missing = 0, flagged** |
+| HOA | Monthly amount | 0 |
+| Utilities | Landlord-paid utilities | $0 (tenant pays). Room to estimate later |
+| Maintenance | `rent × rate(age)` | Age bands below |
+| Management | `rent × managementRate`, only when "property manager" is chosen | 8% |
+| CapEx reserve | `rent × capexRate` | 5% |
+| Debt service | Mortgage payment (below) | By financing type |
 
-- The rent input is available on the analysis form.
-- The estimate by rent per square foot is always labeled "Lower confidence" in the UI.
-- TODO(you): where does the rent-per-square-foot figure come from (a fixed default, the city, user input)? How is it combined with the property's square footage?
+### Maintenance
 
-## 2. Maintenance percentage
+`age = currentYear - yearBuilt`
 
-Used when we can't tell whether the house was recently renovated.
-
-```
-propertyAge = currentYear - yearBuilt
-```
-
-| Property age | Maintenance (% of ...) |
+| Property age | Rate (of monthly rent) |
 |---|---|
 | 0-10 years | 5% |
 | 11-25 years | 7% |
 | 26-50 years | 10% |
-| 50+ years | 12% |
+| 51+ years | 12% |
 
-- TODO(you): decide what the percentage applies to (monthly rent, property value, or annual rent). The result changes a lot depending on the base.
-- TODO(you): the table says "26-50" and "50+". Decide which band a 50-year-old property falls in, and write the boundaries as exact ranges.
-- If renovation data exists later, it should override the age band.
+Year built missing: 10% (conservative), marked as an estimate. A future renovation date should override the age band.
 
-## 3. Monthly expense lines
+### Mortgage
 
-| Line | How it's calculated | Source |
-|---|---|---|
-| Insurance | `annualPremium / 12` | Investor or estimate |
-| Utilities | Estimate | Estimate (landlord-paid utilities only) |
-| HOA | Property data | Property record |
-| Property taxes | Annual tax / 12 | Property data |
-| Vacancy | Percentage of rent | Default, editable |
-| Operating expenses | TODO(you) | Default, editable |
-| Mortgage payment | TODO(you) | Loan inputs, editable |
-| CapEx (major repairs) | TODO(you) | Default, editable |
+```
+loan    = price - downPayment
+r       = annualRate / 12
+n       = termYears × 12
+payment = loan × r / (1 - (1 + r)^-n)        (loan / n when r = 0)
+```
 
-- TODO(you): define each line's unit (monthly or annual) and its default value.
-- TODO(you): the cash flow formula itself:
-  `monthlyCashFlow = effectiveRent - (all monthly expense lines)`. Decide how vacancy enters (reducing income, or listed as an expense).
+- All cash, or a loan of 0: payment is 0.
+- Default term 30 years. Default rates: conventional 7.0%, DSCR 7.75%. These are placeholders to review.
 
-## 4. Results page behavior
+## Where each number came from
 
-The results page shows everything computed from the defaults above.
+Each line carries a `source` so the UI can label it:
+
+| Source | Meaning |
+|---|---|
+| `investor` | Entered or overridden by the investor |
+| `default` | One of the default assumptions above |
+| `estimate` | Derived by a rule from other data (maintenance from age) |
+| `missing` | No data; counted as 0 and should be flagged in the UI |
+
+## Validation (invalid input raises `ValueError`; the API returns 422)
+
+- Rent > 0, price > 0, 0 ≤ down payment ≤ price.
+- Every rate between 0 and 1, term > 0, amounts ≥ 0.
+- Year built not in the future.
+
+## Decisions
+
+- Maintenance is a percentage of monthly rent.
+- Money is `float`, rounded to cents at the API response (not inside the calculation).
+- Scope: NOI and cash flow. Cap rate and cash-on-cash need a closing-cost assumption and come next.
+- No default rent per square foot, because there's no source for one. Rent is required for now.
+
+## Results page behavior
 
 1. **Defaults first.** The investor sees the full results without touching any setting.
-2. **Advanced options.** A section lets the investor change vacancy, operating expenses, mortgage payment, CapEx, and the other assumptions. Results update when they change.
-3. **Card hover.** Hovering over a result card shows:
-   - a plain-language explanation of that card, and
-   - a button (visible only on hover) that opens the advanced factors for that specific calculation.
-4. **Accessibility.** Hover-only controls need a keyboard equivalent: the button and explanation must also appear on keyboard focus, and on touch devices, where hover doesn't exist, they need a tap alternative.
+2. **Advanced options.** The investor can change vacancy, operating expenses, mortgage inputs, CapEx and other assumptions, and the results update.
+3. **Card hover.** Hovering a result card shows a plain-language explanation and a button (visible only on hover) that opens the advanced factors for that calculation.
+4. **Accessibility.** The hover button and explanation must also appear on keyboard focus, with a tap alternative on touch screens.
+5. **Overrides.** Values with source `investor` are marked in the UI so the investor can tell them from defaults.
 
 ## Open questions
 
-1. ~~Where do user overrides live?~~ Proposed in [0002](../decisions/0002-stateless-calculation-and-shareable-analyses.md): overrides are held in component state and sent to a stateless backend calculation endpoint. This still needs approval.
-2. Should an overridden value be marked in the UI, so the investor can tell their number from the default?
-3. Can the investor reset a single value, or all of them, to the defaults?
-4. Does property management (a percentage of rent) belong in the default expenses?
-5. What does "Utilities = estimate" use as its basis?
+1. How should the rent fallback work when the investor gives no rent (rent per square foot, labeled "Lower confidence")? Where does the rate come from?
+2. Should the investor be able to reset one value, or all values, to the defaults?
+3. What is the basis for estimating utilities, if landlord-paid utilities are added later?
+4. Cap rate and cash-on-cash: what closing-cost assumption?
