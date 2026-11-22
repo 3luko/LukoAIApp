@@ -4,7 +4,7 @@ import type { ExperienceInfo } from '../types/analysis'
 export const investorInfo: ExperienceInfo = {
   name: 'Investor',
   audience: 'First-time property investors',
-  tagline: 'Is this property a sound investment?',
+  tagline: 'Know the property. Understand the investment.',
   description:
     'Evaluate a rental property’s income potential, expenses, and risk before you commit capital.',
   highlights: [

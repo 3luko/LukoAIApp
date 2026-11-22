@@ -19,4 +19,4 @@ You implement approved features for LukoAI. The developer is the lead architect 
 
 ## Before you finish
 - Run `npm run build` and `npm run lint` in `frontend/` for frontend work, and `python -m pytest` in `backend/` (use `.venv/Scripts/python`) for backend work.
-- Report: files changed, one or two non-obvious decisions and why, anything left undone, and **UI test notes** for any UI change (route/URL, what to click, what to check, light and dark, mobile width, keyboard focus).
+- Report: files changed, one or two non-obvious decisions and why, anything left undone, and **UI test notes** for any UI change (route/URL, what to click, what to check, mobile and desktop width, keyboard focus).

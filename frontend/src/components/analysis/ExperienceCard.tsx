@@ -11,7 +11,7 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
   return (
     <Card className="flex flex-col gap-5">
       <div className="flex items-center gap-3">
-        <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
+        <span className="grid size-11 place-items-center rounded-control border border-border bg-accent-soft text-fg">
           <ChartIcon width={22} height={22} />
         </span>
         <div>
@@ -22,13 +22,13 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
 
       <div className="space-y-2">
         <p className="font-medium">{experience.tagline}</p>
-        <p className="text-sm text-muted">{experience.description}</p>
+        <p className="font-sans text-sm leading-relaxed text-muted">{experience.description}</p>
       </div>
 
       <ul className="space-y-2 text-sm">
         {experience.highlights.map((item) => (
           <li key={item} className="flex items-start gap-2">
-            <CheckIcon width={18} height={18} className="mt-px shrink-0 text-accent" />
+            <CheckIcon width={18} height={18} className="mt-px shrink-0 text-muted" />
             {item}
           </li>
         ))}

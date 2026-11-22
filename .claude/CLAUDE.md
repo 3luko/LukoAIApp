@@ -11,7 +11,7 @@ backend/    Python + FastAPI (layered: api/routes → services → domain)   (sc
 - Planned services: PostgreSQL (still under consideration), the RentCast API for property data, and Google Gemini Flash for written summaries.
 - API keys stay in the backend. The frontend never calls RentCast or Gemini directly.
 - The frontend currently shows **mock data only** (`frontend/src/data/`), and it's labeled as sample data in the UI.
-- Conventions live in `.claude/rules/frontend.md` and `.claude/rules/backend.md`. Decisions are recorded in `docs/decisions/` and business rules in `docs/logic/`.
+- Conventions live in `.claude/rules/frontend.md` and `.claude/rules/backend.md`. Decisions are recorded in `docs/decisions/` and business rules in `docs/logic/`. The UI design direction (dark Graphite & Silver, monospace-first, minimal) is in `.claude/rules/frontend.md`.
 
 ## Commands
 In `frontend/`:
@@ -62,7 +62,7 @@ Use agents only when specialization pays off. Don't launch four agents for a tri
 - `learning-review` (a teaching-style review) is opt-in. Use it only when asked.
 
 ### UI testing and drafts
-- After any UI change, tell the developer where to test it: the command, the route, the steps, and what to check (light/dark, mobile width, keyboard, loading/error/empty states).
+- After any UI change, tell the developer where to test it: the command, the route, the steps, and what to check (mobile and desktop width, keyboard, reduced motion for animations, loading/error/empty states).
 - When deciding a specific UI change or addition with a real design choice, build **two drafts** the developer can test (switchable with `?ui=a` / `?ui=b`), compare them, wait for the choice, then delete the loser. The `ui-draft-options` skill covers how. Skip this for trivial tweaks.
 
 ### Testing expectations

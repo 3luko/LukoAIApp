@@ -31,7 +31,7 @@ export function ResultsPage() {
 
       <Card>
         <h2 className="font-semibold">Summary</h2>
-        <p className="mt-2 text-muted">{analysis.summary}</p>
+        <p className="mt-2 max-w-3xl font-sans leading-relaxed text-muted">{analysis.summary}</p>
       </Card>
 
       <section aria-label="Key metrics">
@@ -48,7 +48,7 @@ export function ResultsPage() {
         <RiskList risks={analysis.risks} />
         <Card>
           <h3 className="font-semibold">Suggested next steps</h3>
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted marker:text-accent">
+          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted marker:text-subtle">
             {analysis.nextSteps.map((step) => (
               <li key={step}>{step}</li>
             ))}

@@ -36,8 +36,8 @@ export function InputSummaryCard({ inputs }: InputSummaryCardProps) {
       <dl className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((row) => (
           <div key={row.label}>
-            <dt className="text-xs text-muted">{row.label}</dt>
-            <dd className="font-medium">{row.value}</dd>
+            <dt className="text-xs uppercase tracking-wide text-muted">{row.label}</dt>
+            <dd className="font-semibold tabular-nums">{row.value}</dd>
           </div>
         ))}
       </dl>

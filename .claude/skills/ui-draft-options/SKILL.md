@@ -18,7 +18,7 @@ This mechanism is temporary scaffolding, not a permanent feature. Adding the swi
 Tell the developer where to test, every time:
 - **Run:** `npm run dev` in `frontend/`, and the URL or route to open (including the `?ui=` value for drafts).
 - **Steps:** what to click, hover, type or submit.
-- **Check:** expected result, light and dark mode, mobile width, keyboard only (Tab, focus visible, hover content also on focus), and loading/error/empty states.
+- **Check:** expected result, mobile and desktop width, keyboard only (Tab, focus visible, hover content also on focus), and loading/error/empty states.
 - **Known gaps:** anything still mock data or not wired up.
 
 Example: for the metric card hover, Draft A shows the explanation as a tooltip with a hover-only "Advanced factors" button. Draft B expands the card in place. Test notes say to hover and Tab to the card on `/results`, check the button also shows on focus, and check it at phone width.

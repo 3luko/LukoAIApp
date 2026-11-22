@@ -5,7 +5,7 @@ export function MockDataBanner() {
   return (
     <div
       role="note"
-      className="flex items-start gap-3 rounded-xl border border-caution/40 bg-caution/10 px-4 py-3 text-sm"
+      className="flex items-start gap-3 rounded-card border border-caution/40 bg-caution/10 px-4 py-3 text-sm"
     >
       <InfoIcon className="mt-px shrink-0 text-caution" />
       <p>

@@ -1,43 +1,39 @@
 @import 'tailwindcss';
-
-/* Class-based dark mode: `dark:` utilities apply when <html> has the `dark` class. */
-@custom-variant dark (&:where(.dark, .dark *));
+@import '@fontsource-variable/jetbrains-mono';
 
 /*
- * Semantic color tokens. Components use these (bg-surface, text-muted, ...)
- * instead of raw palette colors, so both themes stay consistent.
+ * Design tokens: Graphite & Silver, dark only. This file is the single source for
+ * color, typography, radius and motion. Components use the semantic names below
+ * (bg-surface, text-muted, border-border, ...) and never hardcode values.
  */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #eef1f4;
-  --fg: #111827;
-  --muted: #5b6474;
-  --border: #e2e6eb;
-  --accent: #0f766e;
-  --accent-hover: #115e59;
-  --accent-fg: #ffffff;
-  --accent-soft: #e6f4f2;
-  --positive: #15803d;
-  --caution: #b45309;
-  --negative: #b91c1c;
-  color-scheme: light;
-}
-
-.dark {
-  --bg: #0b0f14;
-  --surface: #121820;
-  --surface-2: #19212b;
-  --fg: #e7eaf0;
-  --muted: #95a0b2;
-  --border: #242e3a;
-  --accent: #2dd4bf;
-  --accent-hover: #5eead4;
-  --accent-fg: #042f2e;
-  --accent-soft: #0f2a2a;
+  /* Color */
+  --bg: #111113;
+  --surface: #1c1c1f;
+  --surface-2: #27272a;
+  --fg: #f4f4f5;
+  --muted: #a1a1aa; /* secondary text */
+  --subtle: #71717a; /* muted elements: placeholders, disabled, hairlines */
+  --border: #3f3f46;
+  --accent: #e4e4e7; /* silver: primary button and emphasis */
+  --accent-hover: #f4f4f5;
+  --accent-fg: #111113;
+  --accent-soft: #27272a;
+  /* Champagne gold: used ONLY to show focus on form fields. Never a brand or button color. */
+  --focus: #c9a86c;
+  --focus-ring: rgba(201, 168, 108, 0.15);
+  /* Semantic, for financial outcomes, warnings and errors only. Always pair with
+     text or a sign so meaning never depends on color alone. */
   --positive: #4ade80;
   --caution: #fbbf24;
   --negative: #f87171;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-wordmark: 1200ms; /* landing wordmark entrance */
+  --duration-page: 520ms; /* page-to-page transition */
+
   color-scheme: dark;
 }
 
@@ -47,21 +43,127 @@
   --color-surface-2: var(--surface-2);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
+  --color-focus: var(--focus);
+  --color-focus-ring: var(--focus-ring);
   --color-positive: var(--positive);
   --color-caution: var(--caution);
   --color-negative: var(--negative);
+
+  /* Typography: monospace is the identity. Sans is for long explanatory text only. */
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Radius (utilities: rounded-control, rounded-card). No shadows by design. */
+  --radius-control: 0.375rem;
+  --radius-card: 0.5rem;
 }
 
 @layer base {
   body {
-    @apply bg-bg text-fg antialiased;
-    font-family:
-      ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-      sans-serif;
+    @apply bg-bg font-mono text-fg antialiased;
+    line-height: 1.6;
+  }
+}
+
+/*
+ * Landing wordmark entrance: it starts 80px to the right, slightly oversized and blurred,
+ * then glides left into its centered position while sharpening and fading in. Transform,
+ * opacity and blur only, so nothing around it shifts. The end state is `none`, so no
+ * filter or transform is left on the element afterwards.
+ */
+@keyframes wordmark-enter {
+  from {
+    opacity: 0;
+    transform: translateX(5rem) scale(1.08);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.wordmark-enter {
+  animation: wordmark-enter var(--duration-wordmark) var(--ease-out) both;
+}
+
+/*
+ * Page transition (landing <-> analyze): slide + fade, using the browser's View Transitions
+ * API. React Router starts it for links with the `viewTransition` prop, and for the
+ * browser's Back/Forward between pages it has transitioned before. The browser keeps a
+ * snapshot of the old page and the new page, and these rules animate the two snapshots.
+ * AppLayout sets data-page-transition on <html>: "forward" slides left, "back" the reverse.
+ */
+@keyframes page-out-forward {
+  to {
+    opacity: 0;
+    transform: translateX(-1.25rem); /* 20px left */
+  }
+}
+
+@keyframes page-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(1.5625rem); /* 25px from the right */
+  }
+}
+
+@keyframes page-out-back {
+  to {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+}
+
+@keyframes page-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5625rem);
+  }
+}
+
+::view-transition-old(root) {
+  animation: page-out-forward var(--duration-page) var(--ease-out) both;
+}
+
+::view-transition-new(root) {
+  animation: page-in-forward var(--duration-page) var(--ease-out) both;
+}
+
+:root[data-page-transition='back']::view-transition-old(root) {
+  animation-name: page-out-back;
+}
+
+:root[data-page-transition='back']::view-transition-new(root) {
+  animation-name: page-in-back;
+}
+
+/* Keep the page clickable while the transition runs. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Motion: all animation and transitions are off for users who ask. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }

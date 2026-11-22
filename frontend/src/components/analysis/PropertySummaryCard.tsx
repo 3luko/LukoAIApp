@@ -17,7 +17,7 @@ export function PropertySummaryCard({ property }: PropertySummaryCardProps) {
   return (
     <Card className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-muted">
+        <span className="grid size-11 shrink-0 place-items-center rounded-control border border-border bg-surface-2 text-muted">
           <HomeIcon width={22} height={22} />
         </span>
         <div>
@@ -30,8 +30,8 @@ export function PropertySummaryCard({ property }: PropertySummaryCardProps) {
       <dl className="grid grid-cols-4 gap-4 text-center sm:gap-6">
         {details.map((d) => (
           <div key={d.label}>
-            <dt className="text-xs text-muted">{d.label}</dt>
-            <dd className="font-semibold tabular-nums">{d.value}</dd>
+            <dt className="text-xs uppercase tracking-wide text-muted">{d.label}</dt>
+            <dd className="text-lg font-semibold tabular-nums">{d.value}</dd>
           </div>
         ))}
       </dl>

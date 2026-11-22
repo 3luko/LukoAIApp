@@ -9,9 +9,9 @@ export function SectionHeading({ title, description, eyebrow, as: Tag = 'h2' }: 
   const size = Tag === 'h1' ? 'text-3xl sm:text-4xl' : Tag === 'h2' ? 'text-xl sm:text-2xl' : 'text-lg'
   return (
     <div className="space-y-1.5">
-      {eyebrow && <p className="text-xs font-semibold uppercase tracking-wider text-accent">{eyebrow}</p>}
+      {eyebrow && <p className="text-xs font-medium uppercase tracking-wider text-muted">{eyebrow}</p>}
       <Tag className={`font-semibold tracking-tight ${size}`}>{title}</Tag>
-      {description && <p className="max-w-2xl text-muted">{description}</p>}
+      {description && <p className="max-w-2xl font-sans leading-relaxed text-muted">{description}</p>}
     </div>
   )
 }
