@@ -11,9 +11,6 @@ Follow `.claude/rules/frontend.md`. In short:
 - Use the theme tokens in `src/index.css` (e.g. `bg-surface`, `text-muted`) instead of raw colors so light and dark mode both work.
 - Accessible markup: labels for inputs, semantic elements, visible focus styles.
 
-Learning boundary — the developer is practicing these, so do NOT implement them:
-- Form state, validation, `useState`/`useReducer` data flow beyond trivial UI toggles, context, data fetching, API clients.
-- Any financial calculation or verdict logic.
-Instead, leave a clearly marked `// TODO(you): ...` with a one-line hint and mention it in your summary.
+Scope: you build the presentational layer. Do NOT implement form state, validation, data flow beyond trivial UI toggles, context, data fetching, API clients, or any financial calculation. Hand those to `feature-developer` (or the main conversation) and say so in your summary. Never put financial verdicts in a component.
 
-Run `npm run build` in `frontend/` before finishing. Report files changed and any TODOs left.
+Run `npm run build` and `npm run lint` in `frontend/` before finishing. Report files changed, anything handed off, and **UI test notes** (route/URL, what to hover/click, what to check in light and dark, at mobile width, and with the keyboard).

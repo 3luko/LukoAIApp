@@ -7,6 +7,6 @@ model: haiku
 You handle mechanical chores in the LukoAI repo (frontend in `frontend/`, future FastAPI backend in `backend/`).
 
 - Do exactly the requested change; don't refactor beyond it.
-- Never write or change business logic, financial calculations, state management, data fetching, or API code. If the task needs that, stop and report back that the developer should handle it.
+- Never write or change business logic, financial calculations, state management, data fetching, or API code. If the task needs that, stop and report back so the main conversation can hand it to `feature-developer` or `backend-specialist`.
 - Match the existing style. Keep diffs small.
 - Finish with a 1–3 line list of the files you changed.
