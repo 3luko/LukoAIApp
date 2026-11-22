@@ -17,7 +17,7 @@ Scraping listing sites (Zillow, Redfin, and similar) is out of scope. Their term
 4. **Show the matched address before using the price.** The response includes the address the API matched. The UI shows it next to the price, so the user can catch a wrong match. No second call is needed.
 5. **Changing the address clears the result.** Editing the address after a lookup removes the old price. A new lookup needs a new click.
 6. **The price is offered inline, not forced.** When a listing price is found, an inline prompt under the address field offers "Use this price" or "Keep my price." The user's own typed price always wins until they choose otherwise.
-7. **`listPrice` is optional.** The lookup may find no listing (for example, an off-market property), so the form must still work without it.
+7. **`listPrice` is required for now (updated 2026-11-21).** This replaces the earlier "optional" decision. The cash flow calculation needs the price, and there is no lookup yet, so the investor must enter it. When the lookup exists it can pre-fill the price, but the investor still ends up with a price before analysis runs. A lookup that finds no listing (for example, an off-market property) leaves the field for the investor to fill in.
 
 ## Options considered
 

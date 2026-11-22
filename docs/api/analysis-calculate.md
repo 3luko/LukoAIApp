@@ -92,5 +92,5 @@ Domain rules that the schema doesn't catch (for example a future `yearBuilt`) re
 ## Not yet decided
 
 - Closing costs, cap rate and cash-on-cash (see the open questions in the logic doc).
-- The form currently allows blank rent and listing price, but this endpoint requires both. See the open question about the rent and price fallback.
+- Rent and price are required by both the form and this endpoint (decided 2026-11-21). A rent fallback is a possible later feature.
 - A `/v1` path prefix, and a Vite dev proxy (`/api` to the backend) when the frontend is wired up.

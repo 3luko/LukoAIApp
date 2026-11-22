@@ -9,7 +9,7 @@ import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorFormGroups } from '../data/formFields'
 import { investorInfo } from '../data/investor'
 import type { InvestorFormValues } from '../types/form'
-import { validateInvestorForm } from '../lib/validateInvestorForm'
+import { parseAmount, validateInvestorForm } from '../lib/validateInvestorForm'
 
 
 export function AnalyzePage() {
@@ -18,6 +18,9 @@ export function AnalyzePage() {
 
   
 
+
+  // Price and rent are required: the analysis can't run without them.
+  const canSubmit = Boolean(values.listPrice?.trim()) && Boolean(values.expectedRent?.trim())
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target
@@ -38,14 +41,14 @@ export function AnalyzePage() {
 
     const parsed : InvestorFormValues = {
       address : raw.address,
-      downPayment : Number(raw.downPayment),
-      expectedRent: Number(raw.expectedRent),
+      downPayment : parseAmount(raw.downPayment),
+      expectedRent: parseAmount(raw.expectedRent),
       financing : raw.financing,
       goal : raw.goal,
-      listPrice: Number(raw.listPrice),
+      listPrice: parseAmount(raw.listPrice),
       management : raw.management,
       propertyType : raw.propertyType,
-      reserves : Number(raw.reserves)
+      reserves : parseAmount(raw.reserves)
     }
 
     // and pass them to the results page (hint: think about where this state should live).
@@ -82,8 +85,12 @@ export function AnalyzePage() {
         ))}
 
         <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">Inputs aren’t saved or analyzed yet. You’ll see sample results.</p>
-          <Button type="submit" size="lg">
+          <p id="submit-help" className="text-sm text-muted">
+            {canSubmit
+              ? 'Inputs aren’t saved or analyzed yet. You’ll see sample results.'
+              : 'Enter the listing price and expected monthly rent to continue.'}
+          </p>
+          <Button type="submit" size="lg" disabled={!canSubmit} aria-describedby="submit-help">
             View sample analysis
           </Button>
         </div>

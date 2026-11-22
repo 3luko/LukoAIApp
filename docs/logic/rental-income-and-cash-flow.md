@@ -90,7 +90,7 @@ Each line carries a `source` so the UI can label it:
 
 ## Open questions
 
-1. How should the rent fallback work when the investor gives no rent (rent per square foot, labeled "Lower confidence")? Where does the rate come from?
+1. ~~What if the investor gives no rent?~~ **Decided 2026-11-21:** monthly rent and listing price are required on the form. The analyze button stays disabled until both are entered, and the results need both. A rent-per-square-foot fallback (labeled "Lower confidence") is a possible later feature, and would need a source for the rate.
 2. Should the investor be able to reset one value, or all values, to the defaults?
 3. What is the basis for estimating utilities, if landlord-paid utilities are added later?
 4. Cap rate and cash-on-cash: what closing-cost assumption?
