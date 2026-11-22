@@ -93,4 +93,10 @@ Domain rules that the schema doesn't catch (for example a future `yearBuilt`) re
 
 - Closing costs, cap rate and cash-on-cash (see the open questions in the logic doc).
 - Rent and price are required by both the form and this endpoint (decided 2026-11-21). A rent fallback is a possible later feature.
-- A `/v1` path prefix, and a Vite dev proxy (`/api` to the backend) when the frontend is wired up.
+- A `/v1` path prefix.
+
+## How the frontend calls it
+
+- Code: `frontend/src/lib/api/analysisApi.ts` (client), `src/hooks/useAnalysis.ts` (debounced hook with loading, error and stale-data states), `src/types/calculate.ts` (types mirroring this contract), `src/lib/formatAnalysis.ts` (display strings).
+- In development the browser calls `/api/analysis/calculate`, and the Vite dev server (`vite.config.ts`) forwards it to `http://localhost:8000/analysis/calculate`, so no CORS setup is needed. Set `VITE_API_BASE_URL` to call a different backend in a deployed build.
+- The results page sends only what the form collects: price, down payment, financing, rent and management. Tax, insurance, HOA and year built aren't collected yet, so the response warns that tax and insurance are missing.
