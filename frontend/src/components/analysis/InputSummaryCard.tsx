@@ -25,7 +25,7 @@ export function InputSummaryCard({ inputs }: InputSummaryCardProps) {
     { label: 'Down payment', value: formatCurrency(inputs.downPayment) },
     { label: 'Financing', value: optionLabel('financing', inputs.financing) },
     { label: 'Cash reserves', value: formatCurrency(inputs.reserves) },
-    { label: 'Expected rent', value: inputs.expectedRent === undefined ? 'Not provided' : formatCurrency(inputs.expectedRent) },
+    { label: 'Expected rent', value: formatCurrency(inputs.expectedRent) },
     { label: 'Management', value: optionLabel('management', inputs.management) },
     { label: 'Primary goal', value: optionLabel('goal', inputs.goal) },
   ]

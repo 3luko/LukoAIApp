@@ -8,7 +8,7 @@ export const investorFormGroups: FieldGroup[] = [
     description: 'Which property are you looking at?',
     fields: [
       { id: 'address', label: 'Property address', type: 'text', placeholder: '123 Maple St, Austin, TX' },
-      { id: 'listPrice', label: 'Listing price', type: 'number', prefix: '$', placeholder: '425,000', optional: true, hint: 'Leave blank to use the listing data.' },
+      { id: 'listPrice', label: 'Listing price', type: 'number', prefix: '$', placeholder: '425,000' },
       {
         id: 'propertyType',
         label: 'Property type',
@@ -43,7 +43,7 @@ export const investorFormGroups: FieldGroup[] = [
   {
     title: 'Rental plan',
     fields: [
-      { id: 'expectedRent', label: 'Expected monthly rent', type: 'number', prefix: '$', placeholder: '2,600', optional: true, hint: 'Leave blank to use a market estimate.' },
+      { id: 'expectedRent', label: 'Expected monthly rent', type: 'number', prefix: '$', placeholder: '2,600', hint: 'What you expect to charge per month.' },
       {
         id: 'goal',
         label: 'Primary goal',

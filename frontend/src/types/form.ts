@@ -30,7 +30,7 @@ export interface InvestorFormValues {
   downPayment: number
   financing: string
   reserves: number
-  expectedRent?: number
+  expectedRent: number
   management: string
   goal: string
 }

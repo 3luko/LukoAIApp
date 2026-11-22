@@ -18,16 +18,29 @@ function checkChoice(value: string | undefined, options: string[]): string | und
 }
 
 /**
- * Returns an error message, or undefined if the text is a valid amount.
- * Commas and $ signs are stripped first, so "425,000" and "$425,000" both work.
+ * Converts form text like "425,000" or "$425,000" to a number.
+ * Commas and $ signs are stripped first. Returns NaN if the text isn't a number.
  */
-function checkAmount(value: string | undefined, required: boolean): string | undefined {
+export function parseAmount(value: string | undefined): number {
+  return Number((value ?? '').trim().replace(/[,$]/g, ''))
+}
+
+/**
+ * Returns an error message, or undefined if the text is a valid amount.
+ * `mustBePositive` rejects 0 as well (price and rent must be above zero).
+ */
+function checkAmount(
+  value: string | undefined,
+  required: boolean,
+  mustBePositive = false,
+): string | undefined {
   const text = (value ?? '').trim()
   if (text === '') return required ? 'Enter an amount.' : undefined
 
-  const amount = Number(text.replace(/[,$]/g, ''))
+  const amount = parseAmount(text)
   if (!Number.isFinite(amount)) return 'Enter a number.'
   if (amount < 0) return 'Amount cannot be negative.'
+  if (mustBePositive && amount === 0) return 'Amount must be greater than 0.'
   return undefined
 }
 
@@ -40,14 +53,19 @@ export function validateInvestorForm(raw: Record<string, string>): InvestorFormE
   // if a field is added to the type but no check is written for it.
   const checks: Record<keyof InvestorFormValues, string | undefined> = {
     address: (raw.address ?? '').trim() === '' ? 'Enter the property address.' : undefined,
-    listPrice: checkAmount(raw.listPrice, false),
+    listPrice: checkAmount(raw.listPrice, true, true),
     propertyType: checkChoice(raw.propertyType, optionsFor('propertyType')),
     downPayment: checkAmount(raw.downPayment, true),
     financing: checkChoice(raw.financing, optionsFor('financing')),
     reserves: checkAmount(raw.reserves, true),
-    expectedRent: checkAmount(raw.expectedRent, false),
+    expectedRent: checkAmount(raw.expectedRent, true, true),
     management: checkChoice(raw.management, optionsFor('management')),
     goal: checkChoice(raw.goal, optionsFor('goal')),
+  }
+
+  // The backend rejects a down payment larger than the price, so catch it here too.
+  if (!checks.downPayment && !checks.listPrice && parseAmount(raw.downPayment) > parseAmount(raw.listPrice)) {
+    checks.downPayment = 'Down payment cannot be more than the listing price.'
   }
 
   const errors: InvestorFormErrors = {}

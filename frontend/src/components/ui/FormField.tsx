@@ -2,22 +2,27 @@ import type { FieldDef } from '../../types/form'
 import type { ChangeEvent } from 'react';
 
 const control =
-  'w-full rounded-lg border border-border bg-bg px-3 py-2.5 text-sm text-fg placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-accent/30'
+  'w-full rounded-lg border bg-bg px-3 py-2.5 text-sm text-fg placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-accent/30'
 
 
 interface FormFieldProps {
   field: FieldDef;
   value: string;
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  /** Validation message to show under the field. */
+  error?: string;
 }
 
 /**
  * Renders a labeled input from a FieldDef.
  * Controlled: the parent owns the value and receives changes through onChange.
- * There's no validation yet.
+ * Shows `error` (when set) under the field and marks the control invalid for screen readers.
  */
-export function FormField({ field, value, onChange }: FormFieldProps) {
+export function FormField({ field, value, onChange, error }: FormFieldProps) {
   const hintId = field.hint ? `${field.id}-hint` : undefined
+  const errorId = error ? `${field.id}-error` : undefined
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
+  const controlClass = `${control} ${error ? 'border-negative' : 'border-border'}`
 
   return (
     <div className="space-y-1.5">
@@ -32,8 +37,9 @@ export function FormField({ field, value, onChange }: FormFieldProps) {
           name={field.id}
           value={value}
           onChange={onChange}
-          aria-describedby={hintId}
-          className={control}
+          aria-describedby={describedBy}
+          aria-invalid={error ? true : undefined}
+          className={controlClass}
         >
           <option value="" disabled>
             Select…
@@ -59,8 +65,9 @@ export function FormField({ field, value, onChange }: FormFieldProps) {
             value={value}
             onChange={onChange}
             placeholder={field.placeholder}
-            aria-describedby={hintId}
-            className={`${control} ${field.prefix ? 'pl-7' : ''}`}
+            aria-describedby={describedBy}
+            aria-invalid={error ? true : undefined}
+            className={`${controlClass} ${field.prefix ? 'pl-7' : ''}`}
           />
         </div>
       )}
@@ -68,6 +75,12 @@ export function FormField({ field, value, onChange }: FormFieldProps) {
       {field.hint && (
         <p id={hintId} className="text-xs text-muted">
           {field.hint}
+        </p>
+      )}
+
+      {error && (
+        <p id={errorId} role="alert" className="text-xs font-medium text-negative">
+          {error}
         </p>
       )}
     </div>
