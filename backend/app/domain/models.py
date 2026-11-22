@@ -50,7 +50,30 @@ class Line:
 
 
 @dataclass(frozen=True)
+class Assumption:
+    """An assumption's resolved value and where it came from. `value` is None when it
+    doesn't apply (interest rate and term for an all-cash purchase)."""
+
+    value: float | None
+    source: Source
+
+
+@dataclass(frozen=True)
+class ResolvedAssumptions:
+    """Every assumption after defaults and overrides are applied, so a UI can show them."""
+
+    vacancy_rate: Assumption
+    maintenance_rate: Assumption
+    management_rate: Assumption
+    capex_rate: Assumption
+    interest_rate: Assumption
+    loan_term_years: Assumption
+    monthly_utilities: Assumption
+
+
+@dataclass(frozen=True)
 class CashFlowResult:
+    assumptions: ResolvedAssumptions
     rent: Line
     vacancy: Line  # the income lost to vacancy, as a positive amount
     effective_rent: float

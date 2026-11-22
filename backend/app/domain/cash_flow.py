@@ -7,17 +7,23 @@
 
 from app.domain import assumptions
 from app.domain.expenses import maintenance_rate, monthly_amount, property_age
-from app.domain.models import CashFlowInputs, CashFlowResult, Line, Source
+from app.domain.models import (
+    Assumption,
+    CashFlowInputs,
+    CashFlowResult,
+    Line,
+    ResolvedAssumptions,
+    Source,
+)
 from app.domain.mortgage import mortgage_payment
 from app.domain.rent import effective_monthly_rent
 
 
-def _rate_line(rent: float, override: float | None, default: float) -> Line:
-    """A line that is a share of monthly rent."""
-    rate = default if override is None else override
-    if not 0 <= rate <= 1:
-        raise ValueError("rates must be between 0 and 1")
-    return Line(rent * rate, "default" if override is None else "investor")
+def _pick(override: float | None, default: float) -> tuple[float, Source]:
+    """The investor's override if given, otherwise the default."""
+    if override is None:
+        return default, "default"
+    return override, "investor"
 
 
 def _annual_line(annual: float | None) -> Line:
@@ -26,11 +32,9 @@ def _annual_line(annual: float | None) -> Line:
     return Line(monthly_amount(annual), "investor")
 
 
-def _monthly_line(monthly: float | None, default: float, default_source: Source) -> Line:
+def _monthly_line(monthly: float | None, default: float) -> Line:
     if monthly is None:
-        return Line(default, default_source)
-    if monthly < 0:
-        raise ValueError("monthly amounts cannot be negative")
+        return Line(default, "default")
     return Line(monthly, "investor")
 
 
@@ -41,36 +45,26 @@ def _validate(inputs: CashFlowInputs) -> None:
         raise ValueError("price must be greater than 0")
     if not 0 <= inputs.down_payment <= inputs.price:
         raise ValueError("down_payment must be between 0 and the price")
-    # Check every rate override, even ones that don't apply (e.g. management when self-managed).
+    # Check every override, even ones that don't apply (e.g. management when self-managed).
     for rate in (
         inputs.vacancy_rate,
         inputs.maintenance_rate,
         inputs.management_rate,
         inputs.capex_rate,
+        inputs.interest_rate,
     ):
         if rate is not None and not 0 <= rate <= 1:
             raise ValueError("rates must be between 0 and 1")
-
-
-def _debt_service(inputs: CashFlowInputs) -> Line:
-    loan = inputs.price - inputs.down_payment
-    if inputs.financing == "cash" or loan == 0:
-        return Line(0.0, "default")
-
-    rate = (
-        assumptions.DEFAULT_INTEREST_RATES[inputs.financing]
-        if inputs.interest_rate is None
-        else inputs.interest_rate
-    )
-    term = (
-        assumptions.DEFAULT_LOAN_TERM_YEARS
-        if inputs.loan_term_years is None
-        else inputs.loan_term_years
-    )
-    overridden = inputs.interest_rate is not None or inputs.loan_term_years is not None
-    return Line(
-        mortgage_payment(loan, rate, term), "investor" if overridden else "default"
-    )
+    if inputs.loan_term_years is not None and inputs.loan_term_years <= 0:
+        raise ValueError("loan_term_years must be greater than 0")
+    for amount in (
+        inputs.annual_property_tax,
+        inputs.annual_insurance,
+        inputs.monthly_hoa,
+        inputs.monthly_utilities,
+    ):
+        if amount is not None and amount < 0:
+            raise ValueError("amounts cannot be negative")
 
 
 def calculate_cash_flow(inputs: CashFlowInputs, current_year: int) -> CashFlowResult:
@@ -78,30 +72,31 @@ def calculate_cash_flow(inputs: CashFlowInputs, current_year: int) -> CashFlowRe
     _validate(inputs)
     rent = inputs.monthly_rent
 
-    vacancy_rate = (
-        assumptions.DEFAULT_VACANCY_RATE if inputs.vacancy_rate is None else inputs.vacancy_rate
-    )
-    vacancy = _rate_line(rent, inputs.vacancy_rate, assumptions.DEFAULT_VACANCY_RATE)
+    vacancy_rate, vacancy_source = _pick(inputs.vacancy_rate, assumptions.DEFAULT_VACANCY_RATE)
+    vacancy = Line(rent * vacancy_rate, vacancy_source)
     effective_rent = effective_monthly_rent(rent, vacancy_rate)
 
     if inputs.maintenance_rate is None:
         age = None if inputs.year_built is None else property_age(inputs.year_built, current_year)
-        maintenance = Line(rent * maintenance_rate(age), "estimate")
+        maintenance_value, maintenance_source = maintenance_rate(age), "estimate"
     else:
-        maintenance = _rate_line(rent, inputs.maintenance_rate, 0.0)
+        maintenance_value, maintenance_source = inputs.maintenance_rate, "investor"
+    maintenance = Line(rent * maintenance_value, maintenance_source)
 
-    management = (
-        _rate_line(rent, inputs.management_rate, assumptions.DEFAULT_MANAGEMENT_RATE)
-        if inputs.managed
-        else Line(0.0, "default")
+    management_value, management_source = _pick(
+        inputs.management_rate, assumptions.DEFAULT_MANAGEMENT_RATE
     )
+    management = (
+        Line(rent * management_value, management_source) if inputs.managed else Line(0.0, "default")
+    )
+
+    capex_value, capex_source = _pick(inputs.capex_rate, assumptions.DEFAULT_CAPEX_RATE)
+    capex = Line(rent * capex_value, capex_source)
 
     property_tax = _annual_line(inputs.annual_property_tax)
     insurance = _annual_line(inputs.annual_insurance)
-    hoa = _monthly_line(inputs.monthly_hoa, 0.0, "default")
-    utilities = _monthly_line(
-        inputs.monthly_utilities, assumptions.DEFAULT_UTILITIES_MONTHLY, "default"
-    )
+    hoa = _monthly_line(inputs.monthly_hoa, 0.0)
+    utilities = _monthly_line(inputs.monthly_utilities, assumptions.DEFAULT_UTILITIES_MONTHLY)
 
     operating_expenses = sum(
         line.monthly
@@ -109,10 +104,37 @@ def calculate_cash_flow(inputs: CashFlowInputs, current_year: int) -> CashFlowRe
     )
     noi = effective_rent - operating_expenses
 
-    capex = _rate_line(rent, inputs.capex_rate, assumptions.DEFAULT_CAPEX_RATE)
-    debt_service = _debt_service(inputs)
+    loan = inputs.price - inputs.down_payment
+    if inputs.financing == "cash":
+        interest = Assumption(None, "default")
+        term = Assumption(None, "default")
+        debt_service = Line(0.0, "default")
+    else:
+        rate_value, rate_source = _pick(
+            inputs.interest_rate, assumptions.DEFAULT_INTEREST_RATES[inputs.financing]
+        )
+        term_value, term_source = _pick(
+            inputs.loan_term_years, assumptions.DEFAULT_LOAN_TERM_YEARS
+        )
+        interest = Assumption(rate_value, rate_source)
+        term = Assumption(float(term_value), term_source)
+        overridden = "investor" in (rate_source, term_source)
+        debt_service = (
+            Line(mortgage_payment(loan, rate_value, int(term_value)), "investor" if overridden else "default")
+            if loan > 0
+            else Line(0.0, "default")
+        )
 
     return CashFlowResult(
+        assumptions=ResolvedAssumptions(
+            vacancy_rate=Assumption(vacancy_rate, vacancy_source),
+            maintenance_rate=Assumption(maintenance_value, maintenance_source),
+            management_rate=Assumption(management_value, management_source),
+            capex_rate=Assumption(capex_value, capex_source),
+            interest_rate=interest,
+            loan_term_years=term,
+            monthly_utilities=Assumption(utilities.monthly, utilities.source),
+        ),
         rent=Line(rent, "investor"),
         vacancy=vacancy,
         effective_rent=effective_rent,
