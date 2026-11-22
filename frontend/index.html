@@ -1,19 +1,13 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Dark only: tells the browser to use dark native controls and canvas before CSS loads. -->
+    <meta name="color-scheme" content="dark" />
     <meta name="description" content="LukoAI — real estate ownership intelligence for first-time property investors." />
     <title>LukoAI</title>
-    <script>
-      // Apply the saved theme before first paint to avoid a light/dark flash. Default: dark.
-      try {
-        if (localStorage.getItem('lukoai-theme') === 'light') {
-          document.documentElement.classList.remove('dark')
-        }
-      } catch {}
-    </script>
   </head>
   <body>
     <div id="root"></div>

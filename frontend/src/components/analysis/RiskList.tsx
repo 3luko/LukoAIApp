@@ -25,7 +25,7 @@ export function RiskList({ risks }: RiskListProps) {
           <li key={risk.title} className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium">{risk.title}</p>
-              <p className="text-sm text-muted">{risk.detail}</p>
+              <p className="mt-0.5 font-sans text-sm leading-relaxed text-muted">{risk.detail}</p>
             </div>
             <Badge tone={severityTone[risk.severity]}>{risk.severity}</Badge>
           </li>
