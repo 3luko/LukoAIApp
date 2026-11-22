@@ -18,6 +18,7 @@ In `frontend/`:
 - `npm run dev`: start the dev server
 - `npm run build`: type-check, then build. Run this before saying frontend work is finished.
 - `npm run lint`
+- To use the results page with real numbers, run the backend (below) and `npm run dev` together. Vite forwards `/api/*` to `localhost:8000`.
 
 In `backend/` (Windows; use the virtual environment in `.venv`):
 - `.venv/Scripts/python -m pytest`: run the tests. Run this before saying backend work is finished.

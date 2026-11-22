@@ -10,6 +10,34 @@ function optionsFor(fieldId: string): string[] {
   return field?.options?.map((option) => option.value) ?? []
 }
 
+/**
+ * True if `value` is a complete, valid set of submitted form values. The results page uses
+ * this to check router state (which anyone can change through the browser history) before
+ * sending it to the backend. It mirrors the backend's rules for the fields it sends.
+ */
+export function isInvestorFormValues(value: unknown): value is InvestorFormValues {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+
+  const isAmount = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x) && x >= 0
+  const isPositive = (x: unknown): x is number => isAmount(x) && x > 0
+  const isChoice = (x: unknown, fieldId: string): boolean =>
+    typeof x === 'string' && optionsFor(fieldId).includes(x)
+
+  return (
+    typeof v.address === 'string' &&
+    isPositive(v.listPrice) &&
+    isAmount(v.downPayment) &&
+    v.downPayment <= v.listPrice &&
+    isAmount(v.reserves) &&
+    isPositive(v.expectedRent) &&
+    isChoice(v.propertyType, 'propertyType') &&
+    isChoice(v.financing, 'financing') &&
+    isChoice(v.management, 'management') &&
+    isChoice(v.goal, 'goal')
+  )
+}
+
 /** Returns an error message, or undefined if a select value is one of its options. */
 function checkChoice(value: string | undefined, options: string[]): string | undefined {
   if (!value) return 'Choose an option.'

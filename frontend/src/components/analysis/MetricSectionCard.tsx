@@ -14,7 +14,10 @@ export function MetricSectionCard({ section }: MetricSectionCardProps) {
       <dl className="mt-4 divide-y divide-border">
         {section.metrics.map((m) => (
           <div key={m.label} className="flex items-center justify-between py-2.5 text-sm">
-            <dt className="text-muted">{m.label}</dt>
+            <dt className="text-muted">
+              {m.label}
+              {m.hint && <span className="block text-xs text-subtle">{m.hint}</span>}
+            </dt>
             <dd className="text-base font-semibold tabular-nums text-fg">{m.value}</dd>
           </div>
         ))}
