@@ -8,10 +8,16 @@ import { FormField } from '../components/ui/FormField'
 import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorFormGroups } from '../data/formFields'
 import { investorInfo } from '../data/investor'
+import type { InvestorFormValues } from '../types/form'
+import { validateInvestorForm } from '../lib/validateInvestorForm'
+
 
 export function AnalyzePage() {
   const navigate = useNavigate()
   const [values, setValues] = useState<Record<string, string>>({})
+
+  
+
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target
@@ -21,8 +27,29 @@ export function AnalyzePage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     // TODO(you): Validate `values`, convert them to InvestorFormValues (numbers, not strings),
+    const raw = values;
+
+
+    const errors = validateInvestorForm(raw)
+    if (Object.keys(errors).length > 0) {
+      console.log('Form errors:', errors)
+      return
+    }
+
+    const parsed : InvestorFormValues = {
+      address : raw.address,
+      downPayment : Number(raw.downPayment),
+      expectedRent: Number(raw.expectedRent),
+      financing : raw.financing,
+      goal : raw.goal,
+      listPrice: Number(raw.listPrice),
+      management : raw.management,
+      propertyType : raw.propertyType,
+      reserves : Number(raw.reserves)
+    }
+
     // and pass them to the results page (hint: think about where this state should live).
-    navigate('/results')
+    navigate('/results', { state : parsed })
   }
 
   return (
