@@ -19,6 +19,11 @@
   --accent-hover: #f4f4f5;
   --accent-fg: #111113;
   --accent-soft: #27272a;
+  /* Cool silver tones for the landing tagline's reflection. No warm or gold tones here. */
+  --silver-base: #a4a7ad;
+  --silver-mid: #c9cdd3;
+  --silver-light: #e8ecf2;
+  --silver-peak: #ffffff;
   /* Champagne gold: used ONLY to show focus on form fields. Never a brand or button color. */
   --focus: #c9a86c;
   --focus-ring: rgba(201, 168, 108, 0.15);
@@ -33,6 +38,7 @@
   --duration-fast: 150ms;
   --duration-wordmark: 1200ms; /* landing wordmark entrance */
   --duration-page: 520ms; /* page-to-page transition */
+  --duration-shimmer: 8s; /* one pass of the tagline reflection */
 
   color-scheme: dark;
 }
@@ -150,8 +156,58 @@
   pointer-events: none;
 }
 
+/*
+ * Silver shimmer: a soft reflection that crosses the text like light on polished silver.
+ * The gradient is three times as wide as the text and is clipped to the letters, so the
+ * shine exists only inside them and the text itself never moves. A narrow bright band
+ * sits in the middle of the gradient, and the animation slides the gradient sideways:
+ * the band enters off one edge, crosses the text, and leaves off the other edge. With
+ * `alternate` it then comes back the other way, so the loop never resets or jumps.
+ * Only background-position changes: no glow, no pulsing, no change in brightness.
+ */
+.silver-shimmer {
+  color: var(--silver-base); /* plain silver text if background-clip: text is unsupported */
+  background-image: linear-gradient(
+    100deg,
+    var(--silver-base) 0%,
+    var(--silver-base) 44%,
+    var(--silver-mid) 46%,
+    var(--silver-light) 48.5%,
+    var(--silver-peak) 50%,
+    var(--silver-light) 51.5%,
+    var(--silver-mid) 54%,
+    var(--silver-base) 56%,
+    var(--silver-base) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0; /* the band starts off the left edge */
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .silver-shimmer {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: silver-shimmer var(--duration-shimmer) ease-in-out infinite alternate;
+  }
+}
+
+@keyframes silver-shimmer {
+  from {
+    background-position: 100% 0; /* band off the left edge */
+  }
+  to {
+    background-position: 0% 0; /* band off the right edge */
+  }
+}
+
 /* Motion: all animation and transitions are off for users who ask. */
 @media (prefers-reduced-motion: reduce) {
+  /* Plain silver text. (Shrinking an infinite animation to 0.01ms would flicker, not stop it.) */
+  .silver-shimmer {
+    animation: none;
+  }
+
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {
@@ -163,6 +219,7 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     transition-delay: 0ms !important;
   }
