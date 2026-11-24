@@ -20,6 +20,16 @@ export const investorFormGroups: FieldGroup[] = [
           { value: 'multi-family', label: 'Multi-family (2–4 units)' },
         ],
       },
+      { id: 'yearBuilt', label: 'Year built', type: 'number', placeholder: '1998', hint: 'Used to estimate maintenance costs.' },
+    ],
+  },
+  {
+    title: 'Ongoing costs',
+    description: 'What it costs to own the property each year and month.',
+    fields: [
+      { id: 'annualPropertyTax', label: 'Annual property tax', type: 'number', prefix: '$', placeholder: '5,200', hint: 'Per year. Check the listing or the county tax record.' },
+      { id: 'annualInsurance', label: 'Annual insurance', type: 'number', prefix: '$', placeholder: '1,800', hint: 'Per year. Use a quote if you have one.' },
+      { id: 'monthlyHoa', label: 'Monthly HOA fee', type: 'number', prefix: '$', placeholder: '0', hint: 'Per month. Enter 0 if there is none.' },
     ],
   },
   {

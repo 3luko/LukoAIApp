@@ -53,7 +53,11 @@ export function AnalyzePage() {
       listPrice: parseAmount(raw.listPrice),
       management : raw.management,
       propertyType : raw.propertyType,
-      reserves : parseAmount(raw.reserves)
+      reserves : parseAmount(raw.reserves),
+      yearBuilt: Number(raw.yearBuilt.trim()),
+      annualPropertyTax: parseAmount(raw.annualPropertyTax),
+      annualInsurance: parseAmount(raw.annualInsurance),
+      monthlyHoa: parseAmount(raw.monthlyHoa),
     }
 
     // The results page reads these from router state.

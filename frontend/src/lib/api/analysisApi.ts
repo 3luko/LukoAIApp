@@ -41,7 +41,13 @@ export function buildCalculateRequest(
   assumptions: AssumptionsInput = {},
 ): CalculateRequest {
   return {
-    property: { price: inputs.listPrice },
+    property: {
+      price: inputs.listPrice,
+      yearBuilt: inputs.yearBuilt,
+      annualPropertyTax: inputs.annualPropertyTax,
+      annualInsurance: inputs.annualInsurance,
+      monthlyHoa: inputs.monthlyHoa,
+    },
     investor: {
       downPayment: inputs.downPayment,
       financing: inputs.financing as Financing,
