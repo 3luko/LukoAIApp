@@ -14,23 +14,14 @@ Decide what it should be (a page, a section, or a short walkthrough). The copy t
 
 ## Results page follow-ups
 
-### 1. Collect property tax, insurance, HOA and year built (do this first)
+_Done: year built, property tax, insurance and HOA are now required form fields, so the cash flow no longer leaves those costs out._ The RentCast lookup (decision 0001) could pre-fill them later.
 
-Right now the form asks for only price, down payment, financing, rent and management. The results page therefore warns that property tax and insurance are missing, and the headline cash flow looks better than it really is (a missing cost counts as $0).
-
-- **Add optional form fields:** annual property tax, annual insurance, monthly HOA, and year built. The backend already accepts them (`annualPropertyTax`, `annualInsurance`, `monthlyHoa`, `yearBuilt`), so no backend change is needed.
-- **Why year built matters:** without it, maintenance falls back to a conservative 10% estimate instead of the age-based rate.
-- **Touches:** `types/form.ts`, `data/formFields.ts`, `lib/validateInvestorForm.ts` (including the `isInvestorFormValues` check), `AnalyzePage.tsx` (the conversion to numbers), `InputSummaryCard.tsx`, and `buildCalculateRequest` in `lib/api/analysisApi.ts`.
-- **Decide first:** are these fields required, or optional with the "missing" warning kept? Optional matches the backend contract.
-- **Later:** the RentCast lookup (decision 0001) could fill these in automatically.
-> Prompt: "Add optional property tax, insurance, HOA and year built fields to the analyze form and send them to the calculate endpoint. Validate them, show them on the inputs card, and make the missing-cost warning disappear when they are filled in."
-
-### 2. Advanced options and card hover explanations
+### 1. Advanced options and card hover explanations
 
 The "Assumptions used" card shows the defaults, but the investor can't change them yet. Each result card should show a plain-language explanation on hover (and keyboard focus), plus a hover-only button that opens the advanced factors for that calculation. `useAnalysis` already accepts an `assumptions` argument and debounces changes, so the editing UI is the main work. Mark values the investor changed, and decide whether they can reset one value or all of them. Offer two testable drafts first.
 > Prompt: "Build the advanced options panel and the result card hover explanations. Give me two drafts to test first (ui-draft-options)."
 
-### 3. More metrics
+### 2. More metrics
 
 Cap rate, cash-on-cash return, DSCR and break-even rent aren't calculated yet, so they're not shown. Cap rate and cash-on-cash need a closing-cost assumption, so decide that first. The summary, risks and next steps on the results page are still sample content until the written summary exists.
 > Prompt: "Propose the formulas, defaults and boundary cases for cap rate and cash-on-cash, including closing costs."

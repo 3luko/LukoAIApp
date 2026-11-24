@@ -1,6 +1,11 @@
 import { investorFormGroups } from '../data/formFields'
 import type { InvestorFormValues } from '../types/form'
 
+/** Earliest year built the backend accepts. */
+const MIN_YEAR_BUILT = 1600
+
+const currentYear = () => new Date().getFullYear()
+
 /** One message per invalid field. An empty object means the form is valid. */
 export type InvestorFormErrors = Partial<Record<keyof InvestorFormValues, string>>
 
@@ -21,6 +26,8 @@ export function isInvestorFormValues(value: unknown): value is InvestorFormValue
 
   const isAmount = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x) && x >= 0
   const isPositive = (x: unknown): x is number => isAmount(x) && x > 0
+  const isYear = (x: unknown): boolean =>
+    typeof x === 'number' && Number.isInteger(x) && x >= MIN_YEAR_BUILT && x <= currentYear()
   const isChoice = (x: unknown, fieldId: string): boolean =>
     typeof x === 'string' && optionsFor(fieldId).includes(x)
 
@@ -32,6 +39,10 @@ export function isInvestorFormValues(value: unknown): value is InvestorFormValue
     isAmount(v.reserves) &&
     isPositive(v.expectedRent) &&
     isChoice(v.propertyType, 'propertyType') &&
+    isYear(v.yearBuilt) &&
+    isAmount(v.annualPropertyTax) &&
+    isAmount(v.annualInsurance) &&
+    isAmount(v.monthlyHoa) &&
     isChoice(v.financing, 'financing') &&
     isChoice(v.management, 'management') &&
     isChoice(v.goal, 'goal')
@@ -72,6 +83,19 @@ function checkAmount(
   return undefined
 }
 
+/** Returns an error message, or undefined if the text is a whole year the backend accepts. */
+function checkYear(value: string | undefined): string | undefined {
+  const text = (value ?? '').trim()
+  if (text === '') return 'Enter the year it was built.'
+
+  const year = Number(text)
+  if (!Number.isInteger(year)) return 'Enter a four-digit year, like 1998.'
+  if (year < MIN_YEAR_BUILT || year > currentYear()) {
+    return `Enter a year between ${MIN_YEAR_BUILT} and ${currentYear()}.`
+  }
+  return undefined
+}
+
 /**
  * Checks the raw form strings before they are converted into InvestorFormValues.
  * Frontend checks guide the user; the backend must still validate everything it receives.
@@ -83,6 +107,10 @@ export function validateInvestorForm(raw: Record<string, string>): InvestorFormE
     address: (raw.address ?? '').trim() === '' ? 'Enter the property address.' : undefined,
     listPrice: checkAmount(raw.listPrice, true, true),
     propertyType: checkChoice(raw.propertyType, optionsFor('propertyType')),
+    yearBuilt: checkYear(raw.yearBuilt),
+    annualPropertyTax: checkAmount(raw.annualPropertyTax, true),
+    annualInsurance: checkAmount(raw.annualInsurance, true),
+    monthlyHoa: checkAmount(raw.monthlyHoa, true),
     downPayment: checkAmount(raw.downPayment, true),
     financing: checkChoice(raw.financing, optionsFor('financing')),
     reserves: checkAmount(raw.reserves, true),

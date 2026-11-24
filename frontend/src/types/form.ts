@@ -27,6 +27,11 @@ export interface InvestorFormValues {
   address: string
   listPrice: number
   propertyType: string
+  yearBuilt: number
+  annualPropertyTax: number
+  annualInsurance: number
+  /** Monthly HOA fee. 0 when there is none. */
+  monthlyHoa: number
   downPayment: number
   financing: string
   reserves: number

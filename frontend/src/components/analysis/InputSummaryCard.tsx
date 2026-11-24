@@ -7,7 +7,7 @@ interface InputSummaryCardProps {
 }
 
 function formatCurrency(amount: number): string {
-  return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+  return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 })
 }
 
 /** Turns a stored option value (e.g. "single-family") into its label ("Single-family"). */
@@ -22,6 +22,10 @@ export function InputSummaryCard({ inputs }: InputSummaryCardProps) {
     { label: 'Property', value: inputs.address },
     { label: 'Listing price', value: formatCurrency(inputs.listPrice) },
     { label: 'Property type', value: optionLabel('propertyType', inputs.propertyType) },
+    { label: 'Year built', value: String(inputs.yearBuilt) },
+    { label: 'Property tax', value: `${formatCurrency(inputs.annualPropertyTax)} / year` },
+    { label: 'Insurance', value: `${formatCurrency(inputs.annualInsurance)} / year` },
+    { label: 'HOA', value: `${formatCurrency(inputs.monthlyHoa)} / month` },
     { label: 'Down payment', value: formatCurrency(inputs.downPayment) },
     { label: 'Financing', value: optionLabel('financing', inputs.financing) },
     { label: 'Cash reserves', value: formatCurrency(inputs.reserves) },
