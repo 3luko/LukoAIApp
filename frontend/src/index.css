@@ -201,6 +201,22 @@
   }
 }
 
+/* The factors panel slides in from the right. */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.factors-panel[open] {
+  animation: panel-in var(--duration-page) var(--ease-out) both;
+}
+
 /* Motion: all animation and transitions are off for users who ask. */
 @media (prefers-reduced-motion: reduce) {
   /* Plain silver text. (Shrinking an infinite animation to 0.01ms would flicker, not stop it.) */

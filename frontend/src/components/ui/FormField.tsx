@@ -26,6 +26,7 @@ interface FormFieldProps {
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   /** Validation message to show under the field. */
   error?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -33,7 +34,7 @@ interface FormFieldProps {
  * Controlled: the parent owns the value and receives changes through onChange.
  * Shows `error` (when set) under the field and marks the control invalid for screen readers.
  */
-export function FormField({ field, value, onChange, error }: FormFieldProps) {
+export function FormField({ field, value, onChange, error, disabled }: FormFieldProps) {
   const hintId = field.hint ? `${field.id}-hint` : undefined
   const errorId = error ? `${field.id}-error` : undefined
   const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
@@ -56,6 +57,7 @@ export function FormField({ field, value, onChange, error }: FormFieldProps) {
           name={field.id}
           value={value}
           onChange={onChange}
+          disabled={disabled}
           aria-describedby={describedBy}
           aria-invalid={error ? true : undefined}
           className={controlClass}
@@ -83,6 +85,7 @@ export function FormField({ field, value, onChange, error }: FormFieldProps) {
             inputMode={field.type === 'number' ? 'decimal' : undefined}
             value={value}
             onChange={onChange}
+            disabled={disabled}
             placeholder={field.placeholder}
             aria-describedby={describedBy}
             aria-invalid={error ? true : undefined}

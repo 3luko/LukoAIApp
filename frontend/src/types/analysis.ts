@@ -7,6 +7,8 @@
 export type Tone = 'neutral' | 'positive' | 'caution' | 'negative'
 
 export interface Metric {
+  /** Stable key for cards that have an explanation and editable factors. */
+  id?: string
   label: string
   value: string
   hint?: string
