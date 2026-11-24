@@ -14,14 +14,9 @@ Decide what it should be (a page, a section, or a short walkthrough). The copy t
 
 ## Results page follow-ups
 
-_Done: year built, property tax, insurance and HOA are now required form fields, so the cash flow no longer leaves those costs out._ The RentCast lookup (decision 0001) could pre-fill them later.
+_Done: year built, property tax, insurance and HOA are now required form fields, so the cash flow no longer leaves those costs out. Also done: hover explanations and an "Adjust" side panel on the headline cards, so the investor can change the assumptions and see the numbers update live._ The RentCast lookup (decision 0001) could pre-fill them later.
 
-### 1. Advanced options and card hover explanations
-
-The "Assumptions used" card shows the defaults, but the investor can't change them yet. Each result card should show a plain-language explanation on hover (and keyboard focus), plus a hover-only button that opens the advanced factors for that calculation. `useAnalysis` already accepts an `assumptions` argument and debounces changes, so the editing UI is the main work. Mark values the investor changed, and decide whether they can reset one value or all of them. Offer two testable drafts first.
-> Prompt: "Build the advanced options panel and the result card hover explanations. Give me two drafts to test first (ui-draft-options)."
-
-### 2. More metrics
+### 1. More metrics
 
 Cap rate, cash-on-cash return, DSCR and break-even rent aren't calculated yet, so they're not shown. Cap rate and cash-on-cash need a closing-cost assumption, so decide that first. The summary, risks and next steps on the results page are still sample content until the written summary exists.
 > Prompt: "Propose the formulas, defaults and boundary cases for cap rate and cash-on-cash, including closing costs."
