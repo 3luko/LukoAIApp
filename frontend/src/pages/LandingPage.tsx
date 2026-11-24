@@ -21,7 +21,8 @@ export function LandingPage() {
           <Wordmark className="wordmark-enter text-6xl sm:text-8xl" />
         </h1>
 
-        <p className="max-w-xl text-balance text-lg text-muted sm:text-xl">{investorInfo.tagline}</p>
+        {/* The silver shimmer lives inside the letters (see `silver-shimmer` in index.css). */}
+        <p className="silver-shimmer max-w-xl text-balance text-lg sm:text-xl">{investorInfo.tagline}</p>
 
         <div className="flex flex-col items-stretch gap-3 sm:flex-row">
           <LinkButton to="/analyze" size="lg" viewTransition>

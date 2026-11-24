@@ -19,6 +19,8 @@ LukoAI should feel like a modern, professional AI property-intelligence platform
 8. **Semantic colors stay sparse.** Positive, caution and negative colors mark outcomes, warnings and errors, and always come with text or a sign.
 9. **Champagne gold marks focus, and only focus.** A focused form field gets a gold border (`--focus`, `#C9A86C`), a soft 3px ring (`--focus-ring`) and a gold label. Gold is never a brand color, a button color or a background. An invalid field stays red while focused, and disabled fields never turn gold. It is plain CSS (`focus:` and `group-focus-within:`), with no React state.
 
+10. **Silver shimmer on the tagline.** A soft, narrow reflection in cool silver tones (`--silver-*` tokens) crosses the landing tagline from left to right and back, 8 seconds per pass, clipped to the letters with CSS only. The text never moves, and there is no glow or pulsing. Reduced motion shows plain silver text.
+
 ## How the landing page works
 
 - `AppLayout` hides the header bar and the footer divider on `/`. Every other page keeps its header (small wordmark plus the "Analyze property" link) and footer.
