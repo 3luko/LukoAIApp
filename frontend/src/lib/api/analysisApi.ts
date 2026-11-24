@@ -18,7 +18,7 @@ import type { InvestorFormValues } from '../../types/form'
 const API_BASE: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
 const TIMEOUT_MS = 10_000
 
-export type ApiErrorKind = 'network' | 'timeout' | 'invalid-input' | 'server'
+export type ApiErrorKind = 'network' | 'timeout' | 'invalid-input' | 'unreachable' | 'server'
 
 /** A failed API call, with a message that is safe to show to the user. */
 export class ApiError extends Error {
@@ -56,6 +56,16 @@ export function buildCalculateRequest(
     },
     assumptions,
   }
+}
+
+/**
+ * A 502, 503 or 504 comes from the dev proxy (or a gateway) when the backend itself can't be
+ * reached, which is different from the backend failing. In development, say how to fix it.
+ */
+function unreachableMessage(): string {
+  const base = 'We can’t reach the calculation service right now. Please try again in a moment.'
+  if (!import.meta.env.DEV) return base
+  return `${base} Is the backend running? Start both servers with “npm run dev:all”, or run “uvicorn app.main:app --reload” in the backend folder.`
 }
 
 /** FastAPI's 422 body is { detail: [{ loc, msg }] }. Returns the messages, if it has that shape. */
@@ -105,6 +115,9 @@ export async function calculateAnalysis(
       'invalid-input',
       messages.length > 0 ? `Check your inputs: ${messages.join(' ')}` : 'Some of your inputs are not valid.',
     )
+  }
+  if (response.status === 502 || response.status === 503 || response.status === 504) {
+    throw new ApiError('unreachable', unreachableMessage())
   }
   if (!response.ok) {
     throw new ApiError('server', 'Something went wrong on our side. Please try again.')
