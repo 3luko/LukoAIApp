@@ -6,7 +6,13 @@ import type { InvestorFormValues } from '../types/form'
 /** Wait this long after the last change before calling the API (for override edits). */
 const DEBOUNCE_MS = 300
 
-type Settled = { key: string; data: CalculateResponse | null; error: string | null }
+type Settled = {
+  key: string
+  data: CalculateResponse | null
+  error: string | null
+  /** The first successful result. The first request has no overrides, so this holds the defaults. */
+  baseline: CalculateResponse | null
+}
 
 export type AnalysisStatus = 'loading' | 'success' | 'error'
 
@@ -15,6 +21,8 @@ export interface AnalysisState {
   /** The latest result. While reloading or after a failed reload it is the previous result. */
   data: CalculateResponse | null
   error: string | null
+  /** The first successful result, which has no overrides applied: the default assumptions. */
+  baseline: CalculateResponse | null
   retry: () => void
 }
 
@@ -46,12 +54,19 @@ export function useAnalysis(
     const timer = setTimeout(() => {
       hasRequested.current = true
       calculateAnalysis(request, controller.signal)
-        .then((data) => setSettled({ key, data, error: null }))
+        .then((data) =>
+          setSettled((previous) => ({ key, data, error: null, baseline: previous?.baseline ?? data })),
+        )
         .catch((error: unknown) => {
           if (controller.signal.aborted) return
           const message =
             error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
-          setSettled((previous) => ({ key, data: previous?.data ?? null, error: message }))
+          setSettled((previous) => ({
+            key,
+            data: previous?.data ?? null,
+            error: message,
+            baseline: previous?.baseline ?? null,
+          }))
         })
     }, delay)
 
@@ -66,6 +81,7 @@ export function useAnalysis(
     status: !current ? 'loading' : settled.error ? 'error' : 'success',
     data: settled?.data ?? null,
     error: current ? settled.error : null,
+    baseline: settled?.baseline ?? null,
     retry: () => setAttempt((count) => count + 1),
   }
 }

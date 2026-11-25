@@ -4,7 +4,8 @@ import type { CalculateResponse } from '../../types/calculate'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { InfoIcon } from '../ui/icons'
-import { MetricGrid } from './MetricGrid'
+import { InteractiveMetricGrid } from './InteractiveMetricGrid'
+import type { AssumptionEditing } from './InteractiveMetricGrid'
 import { MetricSectionCard } from './MetricSectionCard'
 
 interface CalculationResultsProps {
@@ -13,10 +14,13 @@ interface CalculationResultsProps {
   data: CalculateResponse | null
   error: string | null
   onRetry: () => void
+  /** What the cards need to let the investor change assumptions. */
+  editing: AssumptionEditing
+  onResetAll: () => void
 }
 
 /** The calculated cash flow, with its loading, error and warning states. Presentational only. */
-export function CalculationResults({ status, data, error, onRetry }: CalculationResultsProps) {
+export function CalculationResults({ status, data, error, onRetry, editing, onResetAll }: CalculationResultsProps) {
   if (!data) {
     if (status === 'error') {
       return (
@@ -40,12 +44,26 @@ export function CalculationResults({ status, data, error, onRetry }: Calculation
     )
   }
 
+  const changedCount = Object.values(editing.overrides).filter((value) => value !== undefined).length
+
   return (
     <div className="space-y-6">
-      {/* A live region that is always present, so changes are announced. */}
-      <p role="status" className="min-h-5 text-sm text-muted">
-        {status === 'loading' ? 'Updating…' : ''}
-      </p>
+      <div className="flex min-h-5 flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-muted">
+        {/* A live region that is always present, so changes are announced. */}
+        <p role="status">{status === 'loading' ? 'Updating…' : ''}</p>
+        {changedCount > 0 && (
+          <p>
+            You changed {changedCount} {changedCount === 1 ? 'assumption' : 'assumptions'}.{' '}
+            <button
+              type="button"
+              onClick={onResetAll}
+              className="rounded-control underline underline-offset-2 transition-colors duration-(--duration-fast) hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              Reset all
+            </button>
+          </p>
+        )}
+      </div>
 
       {status === 'error' && (
         <div role="alert" className="flex items-center justify-between gap-4 rounded-card border border-negative/40 bg-negative/10 px-4 py-3 text-sm">
@@ -60,7 +78,7 @@ export function CalculationResults({ status, data, error, onRetry }: Calculation
       )}
 
       <section aria-label="Key metrics">
-        <MetricGrid metrics={keyMetrics(data)} />
+        <InteractiveMetricGrid metrics={keyMetrics(data)} editing={editing} />
       </section>
 
       {data.warnings.length > 0 && (

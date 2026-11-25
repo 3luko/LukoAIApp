@@ -21,6 +21,8 @@ LukoAI should feel like a modern, professional AI property-intelligence platform
 
 10. **Silver shimmer on the tagline.** A soft, narrow reflection in cool silver tones (`--silver-*` tokens) crosses the landing tagline from left to right and back, 8 seconds per pass, clipped to the letters with CSS only. The text never moves, and there is no glow or pulsing. Reduced motion shows plain silver text.
 
+11. **Adjusting assumptions: a side panel.** Hovering or focusing a headline result card shows a plain-language explanation and an "Adjust" button (visible only on hover or focus, and always on touch screens). The button opens a side panel with the factors behind that card, and the numbers update live. The alternative, expanding the card in place, was compared and not chosen. The investor's changes live in component state and are sent with each calculation (decision 0002).
+
 ## How the landing page works
 
 - `AppLayout` hides the header bar and the footer divider on `/`. Every other page keeps its header (small wordmark plus the "Analyze property" link) and footer.

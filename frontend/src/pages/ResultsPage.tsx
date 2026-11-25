@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router'
 import { CalculationResults } from '../components/analysis/CalculationResults'
 import { InputSummaryCard } from '../components/analysis/InputSummaryCard'
+import type { AssumptionEditing } from '../components/analysis/InteractiveMetricGrid'
 import { MockDataBanner } from '../components/analysis/MockDataBanner'
 import { RiskList } from '../components/analysis/RiskList'
 import { PageContainer } from '../components/layout/PageContainer'
@@ -10,7 +12,9 @@ import { SectionHeading } from '../components/ui/SectionHeading'
 import { investorInfo } from '../data/investor'
 import { mockInvestorAnalysis } from '../data/mockAnalyses'
 import { useAnalysis } from '../hooks/useAnalysis'
+import type { AssumptionKey } from '../lib/assumptionFields'
 import { isInvestorFormValues } from '../lib/validateInvestorForm'
+import type { AssumptionsInput } from '../types/calculate'
 import type { InvestorFormValues } from '../types/form'
 
 export function ResultsPage() {
@@ -24,7 +28,45 @@ export function ResultsPage() {
 }
 
 function Results({ inputs }: { inputs: InvestorFormValues }) {
-  const { status, data, error, retry } = useAnalysis(inputs)
+  // The investor's changes to the assumptions. They live here, in component state, and are
+  // sent with every calculation (see docs/decisions/0002). Absent means "use the default".
+  const [overrides, setOverrides] = useState<AssumptionsInput>({})
+  const [resetVersion, setResetVersion] = useState(0)
+  const { status, data, error, baseline, retry } = useAnalysis(inputs, overrides)
+
+  function changeOverride(key: AssumptionKey, value: number | undefined) {
+    setOverrides((previous) => {
+      const next = { ...previous }
+      if (value === undefined) delete next[key]
+      else next[key] = value
+      return next
+    })
+  }
+
+  function resetOverrides(keys: AssumptionKey[]) {
+    setOverrides((previous) => {
+      const next = { ...previous }
+      for (const key of keys) delete next[key]
+      return next
+    })
+    setResetVersion((version) => version + 1)
+  }
+
+  const editing: AssumptionEditing = {
+    overrides,
+    baseline: baseline?.assumptions ?? null,
+    // Factors that can't change anything for this property are shown but locked.
+    disabled: {
+      ...(inputs.management === 'self' && { managementRate: 'Applies only if you use a property manager.' }),
+      ...(inputs.financing === 'cash' && {
+        interestRate: 'No loan: this is an all-cash purchase.',
+        loanTermYears: 'No loan: this is an all-cash purchase.',
+      }),
+    },
+    resetVersion,
+    onChange: changeOverride,
+    onReset: resetOverrides,
+  }
 
   // Summary, risks and next steps are still sample content (the written summary comes later).
   const sample = mockInvestorAnalysis
@@ -34,7 +76,14 @@ function Results({ inputs }: { inputs: InvestorFormValues }) {
       <SectionHeading as="h1" eyebrow={`${investorInfo.name} results`} title="Property analysis" />
 
       <InputSummaryCard inputs={inputs} />
-      <CalculationResults status={status} data={data} error={error} onRetry={retry} />
+      <CalculationResults
+        status={status}
+        data={data}
+        error={error}
+        onRetry={retry}
+        editing={editing}
+        onResetAll={() => resetOverrides(Object.keys(overrides) as AssumptionKey[])}
+      />
 
       <MockDataBanner />
 

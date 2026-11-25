@@ -42,14 +42,16 @@ export function keyMetrics(result: CalculateResponse): Metric[] {
   const { cashFlow, income, noi, debtService } = result
   return [
     {
+      id: 'cashFlow',
       label: 'Monthly cash flow',
       value: formatMoney(cashFlow.monthly),
       hint: `${formatMoney(cashFlow.annual)} per year`,
       tone: toneFor(cashFlow.monthly),
     },
-    { label: 'Monthly rent', value: formatMoney(income.grossRent.monthly), hint: sourceLabel(income.grossRent.source) },
-    { label: 'Net operating income', value: formatMoney(noi.monthly), hint: `${formatMoney(noi.annual)} per year` },
+    { id: 'rent', label: 'Monthly rent', value: formatMoney(income.grossRent.monthly), hint: sourceLabel(income.grossRent.source) },
+    { id: 'noi', label: 'Net operating income', value: formatMoney(noi.monthly), hint: `${formatMoney(noi.annual)} per year` },
     {
+      id: 'loanPayment',
       label: 'Loan payment',
       value: formatMoney(debtService.monthly),
       hint: debtService.monthly === 0 ? 'No loan' : sourceLabel(debtService.source),
